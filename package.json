@@ -1,0 +1,30 @@
+{
+  "name": "crud-solid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KongChengdesu/CRUD-Solid.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KongChengdesu/CRUD-Solid/issues"
+  },
+  "homepage": "https://github.com/KongChengdesu/CRUD-Solid#readme",
+  "dependencies": {
+    "@inrupt/solid-client": "^2.1.2",
+    "@inrupt/solid-client-authn-browser": "^2.4.0",
+    "@inrupt/solid-client-authn-node": "^2.4.0",
+    "@inrupt/vocab-common-rdf": "^1.0.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
