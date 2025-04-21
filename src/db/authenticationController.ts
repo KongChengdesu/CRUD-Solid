@@ -4,6 +4,8 @@ import { getSessionFromStorage, getSessionIdFromStorageAll, Session } from "@inr
 export async function Login(req: any, res: any) {
 
     const sessionId = req.body.sessionId;
+    const redirectUrl = req.body.redirectUrl;
+
     const session = new Session({
         keepAlive: true, 
         sessionInfo: {
@@ -18,7 +20,7 @@ export async function Login(req: any, res: any) {
 
     await session.login({
 
-        redirectUrl: `http://localhost:3000/auth/callback?sessionId=${sessionId}`,
+        redirectUrl: redirectUrl,
         oidcIssuer: "https://login.inrupt.com",
         clientName: "Solid CRUD Demo",
         handleRedirect: redirectToSolidIdentityProvider,
