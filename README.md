@@ -1,4 +1,3 @@
-Collecting workspace information```markdown
 # CRUD-Solid
 
 Este projeto é uma API para gerenciar recursos em pods Solid utilizando o framework Express. Abaixo estão os detalhes de todos os endpoints disponíveis.
