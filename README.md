@@ -13,7 +13,7 @@ Este projeto é uma API para gerenciar recursos em pods Solid utilizando o frame
         - `sessionId` (string): ID da sessão do usuário.
         - `redirectUrl` (string): URL para redirecionar após o login.
             - **Exemplo**: `http://localhost:3000/auth/callback?sessionId=${sessionId}`
-- **Resposta**: Redireciona o usuário para o provedor de identidade Solid.
+- **Resposta**: URL em que o usuário deve ser redirecionado para autenticação.
 
 #### `GET /auth/callback`
 - **Descrição**: Callback para lidar com o redirecionamento após o login no Solid.
