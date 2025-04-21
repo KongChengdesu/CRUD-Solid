@@ -8,13 +8,18 @@ Este projeto é uma API para gerenciar recursos em pods Solid utilizando o frame
 
 #### `GET /auth/login`
 - **Descrição**: Inicia o processo de login no Solid.
-- **Parâmetros**: Nenhum.
+- **Parâmetros**: 
+    - **Body**:
+        - `sessionId` (string): ID da sessão do usuário.
+        - `redirectUrl` (string): URL para redirecionar após o login.
 - **Resposta**: Redireciona o usuário para o provedor de identidade Solid.
 
 #### `GET /auth/callback`
 - **Descrição**: Callback para lidar com o redirecionamento após o login no Solid.
 - **Parâmetros**:
-  - `sessionId` (query): ID da sessão.
+    - **Query**:
+        - `sessionId` (string): ID da sessão do usuário.
+        - `code` (string): Código de autorização retornado pelo provedor de identidade.
 - **Resposta**: Retorna uma mensagem indicando o WebID do usuário logado.
 
 ---
