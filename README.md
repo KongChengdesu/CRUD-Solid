@@ -1,3 +1,4 @@
+Collecting workspace information```markdown
 # CRUD-Solid
 
 Este projeto é uma API para gerenciar recursos em pods Solid utilizando o framework Express. Abaixo estão os detalhes de todos os endpoints disponíveis.
@@ -8,16 +9,13 @@ Este projeto é uma API para gerenciar recursos em pods Solid utilizando o frame
 
 #### `GET /auth/login`
 - **Descrição**: Inicia o processo de login no Solid.
-- **Parâmetros**:
-    - `sessionId` (body): ID da sessão.
-    - `redirectUrl` (body): URL para redirecionar após o login.
+- **Parâmetros**: Nenhum.
 - **Resposta**: Redireciona o usuário para o provedor de identidade Solid.
 
 #### `GET /auth/callback`
 - **Descrição**: Callback para lidar com o redirecionamento após o login no Solid.
 - **Parâmetros**:
   - `sessionId` (query): ID da sessão.
-  - `code` (query): Código de autorização retornado pelo provedor de identidade.
 - **Resposta**: Retorna uma mensagem indicando o WebID do usuário logado.
 
 ---
@@ -82,3 +80,24 @@ Este projeto é uma API para gerenciar recursos em pods Solid utilizando o frame
 1. Instale as dependências:
    ```bash
    npm install
+   ```
+
+2. Inicie o servidor:
+   ```bash
+   npm start
+   ```
+
+3. O servidor estará disponível em `http://localhost:3000`.
+
+---
+
+## Dependências
+
+- `express`
+- `@inrupt/solid-client`
+- `@inrupt/solid-client-authn-node`
+- `dotenv`
+
+Para mais informações, consulte o arquivo [package.json](package.json).
+
+---
