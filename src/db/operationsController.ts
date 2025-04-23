@@ -148,12 +148,13 @@ export async function ReadResource(req: any, res: any) {
     const { resourceUrl } = req.query; // Expecting resourceUrl as a query parameter
 
     try {
-        const dataset = await getSolidDataset(resourceUrl as string, { fetch: session.fetch });
-        const thing = getThing(dataset, resourceUrl as string);
-
-        res.status(200).json(thing);
-    } catch (error) {
-        res.status(500).send(`Error reading resource: ${error.message}`);
+        const response = await session.fetch(resourceUrl);
+        const content = await response.text();
+        res.status(200).send(content);
+    } catch (err) {
+        console.error('Error reading resource:', err);
+        res.status(500).send("Error reading resource.");
+    } finally {
     }
 }
 
