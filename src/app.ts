@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import { Router } from 'express';
 import AuthenticationRouter from './router/authenticationRouter';
@@ -15,6 +16,7 @@ app.listen(port, () => {
 });
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/auth', AuthenticationRouter);
 app.use('/op', OperationsRouter);

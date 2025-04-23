@@ -37,17 +37,21 @@ export async function Login(req: any, res: any) {
 export async function LoginCallback(req: any, res: any) {
 
     const sessionId = req.headers['session-id'];
-    console.log(req.headers);
     const session = await getSessionFromStorage(sessionId);
+    if (!session) {
+        return res.status(401).send("Session not found or user is not logged in.");
+    }
     
     const code = req.body.code;
     const state = req.body.state;
     const iss = req.body.iss;
-    console.log(`http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`)
+    
+    
+    
     await session.handleIncomingRedirect(`
         http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`);
     if (session.info.isLoggedIn) {
-        return res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
+        return res.status(200).send(`Logged in with the WebID ${session.info.webId}`)
     }
 
 }
