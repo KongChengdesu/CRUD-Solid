@@ -36,11 +36,13 @@ export async function Login(req: any, res: any) {
 
 export async function LoginCallback(req: any, res: any) {
 
-    const sessionId = req.body.sessionId;
+    const sessionId = req.headers['session-id'];
+    console.log(req.headers);
+    const session = await getSessionFromStorage(sessionId);
+    
     const code = req.body.code;
     const state = req.body.state;
     const iss = req.body.iss;
-    const session = await getSessionFromStorage(sessionId);
     console.log(`http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`)
     await session.handleIncomingRedirect(`
         http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`);

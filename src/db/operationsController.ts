@@ -29,7 +29,7 @@ async function loadSession(sessionId: string): Promise<Session | null> {
 
 export async function getPodInfo(req: any, res: any) {
 
-    const sessionId = req.body.sessionId;
+    const sessionId = req.headers['session-id'];
     const podInfo = await getPodInfoCached(sessionId);
     if (!podInfo) {
         return res.status(500).send("Error retrieving POD information.");
@@ -41,14 +41,14 @@ export async function getPodInfo(req: any, res: any) {
 
 export async function loadFolderContent(req: any, res: any) {
 
-    const sessionId = req.body.sessionId;
+    const sessionId = req.headers['session-id'];
     const session = await loadSession(sessionId);
 
     if (!session) {
         return res.status(401).send("User is not logged in.");
     }
 
-    const folderUrl = req.body.folderUrl;
+    const folderUrl = req.query.folderUrl;
 
     try {
         console.log('Fetching folder:', folderUrl);
@@ -108,8 +108,8 @@ export async function loadFolderContent(req: any, res: any) {
 // Create a resource in the pod
 export async function CreateResource(req: any, res: any) {
 
-    const session = await getSessionFromStorage(req.body.sessionId);
-    const info = await getPodInfoCached(req.body.sessionId);
+    const session = await getSessionFromStorage(req.headers['session-id']);
+    const info = await getPodInfoCached(req.headers['session-id']);
 
     const folderUrl = req.body.folderUrl;
     const itemName = req.body.itemName;
@@ -140,7 +140,7 @@ export async function CreateResource(req: any, res: any) {
 
 // Read a resource from the pod
 export async function ReadResource(req: any, res: any) {
-    const session = await getSessionFromStorage(req.body.sessionId);
+    const session = await getSessionFromStorage(req.headers['session-id']);
     if (!session?.info.isLoggedIn) {
         return res.status(401).send("User is not logged in.");
     }
@@ -159,7 +159,7 @@ export async function ReadResource(req: any, res: any) {
 
 // Update a resource in the pod
 export async function UpdateResource(req: any, res: any) {
-    const session = await getSessionFromStorage(req.body.sessionId);
+    const session = await getSessionFromStorage(req.headers['session-id']);
     if (!session?.info.isLoggedIn) {
         return res.status(401).send("User is not logged in.");
     }
@@ -190,7 +190,7 @@ export async function UpdateResource(req: any, res: any) {
 
 // Delete a resource from the pod
 export async function DeleteResource(req: any, res: any) {
-    const session = await getSessionFromStorage(req.body.sessionId);
+    const session = await getSessionFromStorage(req.headers['session-id']);
     if (!session?.info.isLoggedIn) {
         return res.status(401).send("User is not logged in.");
     }
