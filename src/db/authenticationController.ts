@@ -55,3 +55,19 @@ export async function LoginCallback(req: any, res: any) {
     }
 
 }
+
+export async function CheckSessionStatus(req: any, res: any) {
+
+    const sessionId = req.headers['session-id'];
+    const session = await getSessionFromStorage(sessionId);
+    if (!session) {
+        return res.status(401).send("Session not found or user is not logged in.");
+    }
+
+    if (session.info.isLoggedIn) {
+        return res.status(200).send(`Logged in with the WebID ${session.info.webId}`);
+    }
+
+    return res.status(401).send("User is not logged in.");
+
+}

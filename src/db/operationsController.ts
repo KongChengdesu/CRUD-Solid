@@ -119,6 +119,8 @@ export async function CreateResource(req: any, res: any) {
     try {
         const newItemUrl = `${folderUrl}${itemName}${itemType === 'folder' ? '/' : ''}`;
 
+        console.log('Creating resource:', newItemUrl);
+
         if (itemType === 'folder') {
             await createContainerAt(newItemUrl, { fetch: session.fetch });
         } else {
