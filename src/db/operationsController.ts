@@ -1,38 +1,140 @@
-import { Request, Response } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 import {
     getSolidDataset,
     getThing,
     setThing,
+    getUrl,
+    getContainedResourceUrlAll,
     saveSolidDatasetAt,
     createThing,
+    createContainerAt,
+    createSolidDataset,
     deleteSolidDataset,
     buildThing,
 } from "@inrupt/solid-client";
 
-// Create a resource in the pod
-export async function CreateResource(req: any, res: any) {
-    const session = await getSessionFromStorage(req.body.sessionId);
+import { getFolderNameFromUrl } from "../utils/dbUtils";
+import { getPodInfoCached } from "./podInfoCache";
+
+async function loadSession(sessionId: string): Promise<Session | null> {
+
+    const session = await getSessionFromStorage(sessionId);
     if (!session?.info.isLoggedIn) {
+        console.error("Session is not logged in or does not exist.");
+        return null;
+    }
+    return session;
+
+}
+
+export async function getPodInfo(req: any, res: any) {
+
+    const sessionId = req.body.sessionId;
+    const podInfo = await getPodInfoCached(sessionId);
+    if (!podInfo) {
+        return res.status(500).send("Error retrieving POD information.");
+    }
+
+    res.status(200).json(podInfo);
+}
+
+
+export async function loadFolderContent(req: any, res: any) {
+
+    const sessionId = req.body.sessionId;
+    const session = await loadSession(sessionId);
+
+    if (!session) {
         return res.status(401).send("User is not logged in.");
     }
 
-    const { podUrl, data } = req.body; // Expecting podUrl and data in the request body
-    const resourceUrl = `${podUrl}/newResource`;
+    const folderUrl = req.body.folderUrl;
 
     try {
-        const thing = buildThing(createThing({ name: "exampleThing" }))
-            .addStringNoLocale("http://schema.org/name", data.name)
-            .addStringNoLocale("http://schema.org/description", data.description)
-            .build();
+        console.log('Fetching folder:', folderUrl);
 
-        let dataset = await getSolidDataset(podUrl, { fetch: session.fetch });
-        dataset = setThing(dataset, thing);
+        const dataset = await getSolidDataset(folderUrl, {
+            fetch: session.fetch
+        });
 
-        await saveSolidDatasetAt(resourceUrl, dataset, { fetch: session.fetch });
-        res.status(201).send("Resource created successfully.");
-    } catch (error) {
-        res.status(500).send(`Error creating resource: ${error.message}`);
+        console.log('Dataset fetched:', dataset);
+
+        const containedResources = getContainedResourceUrlAll(dataset);
+        console.log('Contained resources:', containedResources);
+
+        const items = await Promise.all(
+            containedResources.map(async (resourceUrl) => {
+                try {
+                    const isFolder = resourceUrl.endsWith('/');
+                    const name = getFolderNameFromUrl(resourceUrl);
+
+                    return {
+                        name,
+                        url: resourceUrl,
+                        isFolder
+                    };
+                } catch (error) {
+                    console.warn(`Error processing resource ${resourceUrl}:`, error);
+                    return null;
+                }
+            })
+        );
+
+        const validItems = items
+            .filter((item): item is NonNullable<typeof item> => item !== null)
+            .sort((a, b) => {
+                // Ordenar pastas primeiro, depois arquivos
+                if (a.isFolder && !b.isFolder) return -1;
+                if (!a.isFolder && b.isFolder) return 1;
+                return a.name.localeCompare(b.name);
+            });
+
+        const folder = {
+            name: getFolderNameFromUrl(folderUrl),
+            url: folderUrl,
+            items: validItems
+        } as FolderContent;
+
+        res.status(200).json(folder);
+
+    } catch (err) {
+        console.error('Error loading folder:', err);
+        res.status(500).send("Error loading folder content.");
+    }
+};
+
+
+
+// Create a resource in the pod
+export async function CreateResource(req: any, res: any) {
+
+    const session = await getSessionFromStorage(req.body.sessionId);
+    const info = await getPodInfoCached(req.body.sessionId);
+
+    const folderUrl = req.body.folderUrl;
+    const itemName = req.body.itemName;
+    const itemType = req.body.itemType; // 'folder' or 'file'
+    const itemContent = req.body.itemContent; // Content for the file, if applicable
+
+    try {
+        const newItemUrl = `${folderUrl}${itemName}${itemType === 'folder' ? '/' : ''}`;
+
+        if (itemType === 'folder') {
+            await createContainerAt(newItemUrl, { fetch: session.fetch });
+        } else {
+            const newDataset = createSolidDataset();
+            const thing = buildThing(createThing())
+                .addStringNoLocale(info!.baseUrl, itemContent || '')
+                .build();
+
+            console.log(thing)
+
+            const datasetWithThing = setThing(newDataset, thing);
+            await saveSolidDatasetAt(newItemUrl, datasetWithThing, { fetch: session.fetch });
+        }
+
+    } catch (err) {
+        console.error('Error creating item:', err);
     }
 }
 

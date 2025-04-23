@@ -3,7 +3,7 @@ import { Login, LoginCallback } from '../db/authenticationController';
 
 const AuthenticationRouter = Router();
 
-AuthenticationRouter.get('/login', Login);
-AuthenticationRouter.get('/callback', LoginCallback);
+AuthenticationRouter.post('/login', Login);
+AuthenticationRouter.post('/callback', LoginCallback);
 
 export default AuthenticationRouter;

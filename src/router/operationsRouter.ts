@@ -4,6 +4,8 @@ import {
     ReadResource,
     UpdateResource,
     DeleteResource,
+    loadFolderContent,
+    getPodInfo
 } from "../db/operationsController";
 
 const OperationsRouter = express.Router();
@@ -13,6 +15,10 @@ OperationsRouter.post("/create", CreateResource);
 
 // Endpoint to read a resource
 OperationsRouter.get("/read", ReadResource);
+
+OperationsRouter.get("/pod", getPodInfo);
+
+OperationsRouter.get("/folder", loadFolderContent);
 
 // Endpoint to update a resource
 OperationsRouter.put("/update", UpdateResource);

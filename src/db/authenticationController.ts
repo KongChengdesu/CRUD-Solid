@@ -3,19 +3,24 @@ import { getSessionFromStorage, getSessionIdFromStorageAll, Session } from "@inr
 
 export async function Login(req: any, res: any) {
 
-    const sessionId = req.body.sessionId;
     const redirectUrl = req.body.redirectUrl;
 
     const session = new Session({
         keepAlive: true, 
-        sessionInfo: {
-            sessionId: sessionId, 
-            isLoggedIn: false
-        }
     });
 
+
     const redirectToSolidIdentityProvider = (url: string) => {
-        res.status(200).send(url);
+
+        const loginInfo = {
+
+            sessionId: session.info.sessionId,
+            loginUrl: url
+    
+        }
+
+        res.status(200).json(loginInfo);
+        
     }
 
     await session.login({
@@ -31,9 +36,14 @@ export async function Login(req: any, res: any) {
 
 export async function LoginCallback(req: any, res: any) {
 
-    const sessionId = req.query.sessionId;
+    const sessionId = req.body.sessionId;
+    const code = req.body.code;
+    const state = req.body.state;
+    const iss = req.body.iss;
     const session = await getSessionFromStorage(sessionId);
-    await session.handleIncomingRedirect(`http://localhost:3000/auth${req.url}`);
+    console.log(`http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`)
+    await session.handleIncomingRedirect(`
+        http://localhost:3000/auth/callback?code=${code}&state=${state}&iss=${iss}`);
     if (session.info.isLoggedIn) {
         return res.send(`<p>Logged in with the WebID ${session.info.webId}.</p>`)
     }
